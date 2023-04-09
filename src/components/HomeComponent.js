@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
 
 const Home = () => {
   const classes = useStyles();
-  const name ='name'
+  const name = "name";
 
   return (
     <ThemeProvider theme={theme}>
