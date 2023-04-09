@@ -1,15 +1,22 @@
 FROM node:16.16.0-alpine
-
+# Set working directory
 WORKDIR /app
 
-COPY . .
+# Install app dependencies
+COPY package*.json ./
+RUN npm install
 
+# Set environment variables
+ENV PORT=3000
+ENV NODE_ENV=development
 
-RUN yarn install
+# Expose port for development server
+EXPOSE ${PORT}
 
-CMD ["yarn", "start"]
+# Start the development server with hot reloading
+CMD ["npm", "run", "dev"]
 
-
-EXPOSE 3000
-
-
+# Debugging configuration
+ENV DEBUG_PORT=9229
+ENV DEBUG_HOST=0.0.0.0
+ENV NODE_OPTIONS=--inspect-brk=0.0.0.0:${DEBUG_PORT}

@@ -17,8 +17,19 @@ import { ThemeProvider } from "@mui/material/styles";
 import { useDispatch } from "react-redux";
 import { Login } from "../Redux/loginSlice";
 import { useNavigate } from "react-router-dom";
+import Joi from "joi";
+import { useSnackbar } from "notistack";
+import { getFcmToken } from "../helpers/firebase_helpers";
+
+const signInSchema = Joi.object({
+  email_id: Joi.string()
+    .email({ tlds: { allow: false } })
+    .required(),
+  password: Joi.string().required().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")),
+});
 
 const SignInForm = () => {
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   // const isLoggedIn = useSelector((state) => state.auth.isLoggedin);
 
   const nav = useNavigate();
@@ -31,6 +42,14 @@ const SignInForm = () => {
       email_id: data.get("email"),
       password: data.get("password"),
     };
+    const { error, value } = signInSchema.validate(payload);
+    if (error) {
+      enqueueSnackbar(error);
+      return;
+    }
+
+    const res = await getFcmToken();
+    // console.log(res);
 
     const response = await axios.post(
       "http://localhost:4000/api/Login",
@@ -39,9 +58,7 @@ const SignInForm = () => {
     // const responseData = response.data;
 
     const responseData = response.data;
-    console.log(responseData)
-
-    
+    console.log(responseData);
 
     if (responseData.loggedIn === true) {
       nav("/HomeComponent");
@@ -94,7 +111,6 @@ const SignInForm = () => {
               autoComplete="current-password"
             />
 
-
             <Button
               type="submit"
               fullWidth
@@ -109,7 +125,6 @@ const SignInForm = () => {
                   Forgot password?
                 </Link>
               </Grid>
-          
             </Grid>
           </Box>
         </Box>

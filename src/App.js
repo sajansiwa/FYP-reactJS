@@ -7,18 +7,23 @@ import DrawerComponent from "./components/drawer";
 import UserProfile from "./components/profile";
 import Incomming from "./components/incomming";
 
+import { initializeApp } from "firebase/app";
+
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import About from "./components/about";
+import { SnackbarProvider } from "notistack";
+import { useEffect } from "react";
+
+export let firebaseApp;
 
 const App = () => {
-  // const LoginStatus = useSelector((state) => state.auth.isLoggedin);
-  // console.log("app state:", LoginStatus);
-
+  useEffect(() => {
+    firebaseApp = initializeApp(firebaseConfig);
+  }, []);
   return (
-    <div>
+    <SnackbarProvider>
       <Router>
         <NavBar />
-        {/* {if (!LoginStatus) {<NavBar />} } */}
         <Routes>
           <Route path="/HomeComponent" element={<Home />} />
           <Route path="/Profile" element={<UserProfile />} />
@@ -26,11 +31,20 @@ const App = () => {
           <Route path="/signup" element={<SignupForm />} />
           <Route path="/about" element={<About />} />
           <Route path="/incomming" element={<Incomming />} />
-          
         </Routes>
       </Router>
-    </div>
+    </SnackbarProvider>
   );
+};
+
+export const firebaseConfig = {
+  apiKey: "AIzaSyBY-cy02eGUphORAPYztuu9d9akron71tI",
+  authDomain: "hospital-1dad3.firebaseapp.com",
+  projectId: "hospital-1dad3",
+  storageBucket: "hospital-1dad3.appspot.com",
+  messagingSenderId: "602731118828",
+  appId: "1:602731118828:web:04dcfd5a8c31f1750e65c9",
+  measurementId: "G-FSZKXREGVC",
 };
 
 export default App;

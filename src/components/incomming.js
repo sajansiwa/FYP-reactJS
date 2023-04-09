@@ -1,39 +1,224 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Box } from "@mui/system";
 // import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import DrawerComponent from "./drawer";
+
+import { makeStyles, ThemeProvider } from "@material-ui/core/styles";
+import Tabs from "@material-ui/core/Tabs";
+import Tab from "@material-ui/core/Tab";
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemText from "@material-ui/core/ListItemText";
+import {
+  Avatar,
+  Button,
+  Container,
+  Grid,
+  IconButton,
+  ListItemAvatar,
+  Snackbar,
+} from "@mui/material";
+import theme from "../theme/theme";
+import { deepPurple } from "@mui/material/colors";
+import snackbar from "snackbar/lib/snackbar";
+import { useSnackbar } from "notistack";
+import axios from "axios";
+
 // import { CssBaseline } from "@material-ui/core";
 
-const Incomming = () => {
+const useStyles = makeStyles((theme) => ({
+  root: {
+    flexGrow: 1,
+    backgroundColor: theme.palette.background.paper,
+  },
+}));
+
+export default function Incoming(props) {
+  const { inComingNotification, setInComingNotification } = useState([]);
+  const { completedNotification, setCompletedNotification } = useState([]);
+  const { cancelledNotification, setCancelledNotification } = useState([]);
+
+  useEffect(() => {
+    axios
+      .get("/api/visitedHosp")
+      .then((response) => setInComingNotification(response.data));
+  }, [inComingNotification, completedNotification, cancelledNotification]);
+
+  const classes = useStyles();
+
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+
+  const [value, setValue] = useState(0);
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
   return (
-    <Box>
-      <DrawerComponent />
-      <Box
-        component="main"
-        sx={{ flexGrow: 1, p: 1, ml: 32, overflow: "auto", mt: 10 }}
-      >
-        <Typography paragraph>
-      
-        </Typography>
-        <Typography paragraph>
-          Consequat mauris nunc congue nisi vitae suscipit. Fringilla est
-          ullamcorper eget nulla facilisi etiam dignissim diam. Pulvinar
-          elementum integer enim neque volutpat ac tincidunt. Ornare suspendisse
-          sed nisi lacus sed viverra tellus. Purus sit amet volutpat consequat
-          mauris. Elementum eu facilisis sed odio morbi. Euismod lacinia at quis
-          risus sed vulputate odio. Morbi tincidunt ornare massa eget egestas
-          purus viverra accumsan in. In hendrerit gravida rutrum quisque non
-          tellus orci ac. Pellentesque nec nam aliquam sem et tortor. Habitant
-          morbi tristique senectus et. Adipiscing elit duis tristique
-          sollicitudin nibh sit. Ornare aenean euismod elementum nisi quis
-          eleifend. Commodo viverra maecenas accumsan lacus vel facilisis. Nulla
-          posuere sollicitudin aliquam ultrices sagittis orci a.
-        </Typography>
-
+    <ThemeProvider theme={theme}>
+      <Box>
+        <DrawerComponent />
+        <Container>
+          <Box
+            component="main"
+            sx={{
+              flexGrow: 1,
+              display: "flex",
+              justifyContent: "center",
+              p: 1,
+              ml: 32,
+              overflow: "auto",
+              mt: 10,
+              bgcolor: "secondary.main",
+            }}
+          >
+            <Tabs
+              value={value}
+              onChange={handleChange}
+              indicatorColor="primary"
+              textColor="primary"
+              centered
+            >
+              <Tab
+                label="Incoming"
+                onClick={() =>
+                  enqueueSnackbar("Incoming Emergency", {
+                    disableWindowBlurListener: true,
+                    anchorOrigin: {
+                      horizontal: "center",
+                      vertical: "top",
+                    },
+                    autoHideDuration: 2000,
+                  })
+                }
+              />
+              <Tab label="Completed" />
+              <Tab label="Cancelled" />
+            </Tabs>
+          </Box>
+          <Box
+            component="main"
+            sx={{
+              flexGrow: 1,
+              display: "flex",
+              justifyContent: "center",
+              // p: 1,
+              // ml: 32,
+              // overflow: "auto",
+              // mt: 10,
+              bgcolor: "secondary.main",
+            }}
+          >
+            {inComingNotification.map((data) => (
+              <List>
+                <ListItemLink>
+                  <ListItemAvatar>
+                    <Avatar
+                      alt="A"
+                      src="/static/images/avatar/1.jpg"
+                      sx={{ bgcolor: deepPurple[900] }}
+                    />
+                  </ListItemAvatar>
+                  <ListItemText
+                    primary={data.name}
+                    // secondary="Emergency for Aayush"
+                  />
+                </ListItemLink>
+              </List>
+            ))}
+          </Box>
+        </Container>
       </Box>
-    </Box>
+    </ThemeProvider>
   );
-};
+}
 
-export default Incomming;
+// const Incomming = () => {
+//   const [notifications, setNotifications] = useState(["aayush"]);
+//   const classes = useStyles();
+
+//   return (
+//     <Grid>
+//       <Grid xs={8}>
+
+//       </Grid>
+//       <Box
+//         component="main"
+//         sx={{ p: 1, ml: 32, overflow: "auto", mt: 5 }}
+//         centered
+//       ></Box>
+//       <div className={classes.root}>
+
+//         {value === 0 && (
+//           <List
+//             sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}
+//           >
+//             <ListItemLink href="#">
+//               <ListItemText
+//                 primary="Item 3"
+//                 secondary="This is a completed item"
+//               />
+//             </ListItemLink>
+//           </List>
+//         )}
+
+//         {value === 1 && (
+
+//         )}
+
+//         {value === 2 && (
+//           <List>
+//             <ListItemLink href="#">
+//               <ListItemAvatar>
+//                 <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+//               </ListItemAvatar>
+//               <ListItemText
+//                 primary="Item 5"
+//                 secondary="This is a cancelled item"
+//               />
+//             </ListItemLink>
+//             <ListItemLink href="#">
+//               <ListItemText
+//                 primary="Item 6"
+//                 secondary="This is also a cancelled item"
+//               />
+//             </ListItemLink>
+//           </List>
+//         )}
+//       </div>
+//     </Grid>
+//   );
+// };
+
+function ListItemLink(props) {
+  return <ListItem button component="a" {...props} />;
+}
+
+// export default Incomming;
+
+// //  <List
+// //   sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}
+// // >
+// //   {[0, 1, 2, 3, 4, 5, 6].map((value) => {
+// //     const labelId = `checkbox-list-label-${value}`;
+
+// //     return (
+// //       <ListItem
+// //         key={value}
+// //         secondaryAction={
+// //           <IconButton edge="end" aria-label="comments">
+// //             {/* <CommentIcon /> */}
+// //           </IconButton>
+// //         }
+// //         disablePadding
+// //       >
+// //         <ListItemButton role={undefined} dense>
+// //           <ListItemText
+// //             id={labelId}
+// //             primary={`Line item ${value + 1}`}
+// //           />
+// //         </ListItemButton>
+// //       </ListItem>
+// //     );
+// //   })}
+// // </List>

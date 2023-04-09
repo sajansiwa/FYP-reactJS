@@ -14,10 +14,23 @@ import { ThemeProvider } from "@mui/material/styles";
 // other imports
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import Joi from "joi";
+import { useSnackbar } from "notistack";
 
 const API_KEY = "AIzaSyDh-hd8fgRHqk9ll9faCCuGA5vjka_XVCU";
 
+const schema = Joi.object({
+  email: Joi.string()
+    .email({ tlds: { allow: false } })
+    .required(),
+  name: Joi.string().required(),
+  password: Joi.string().required().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")),
+  phoneNumber: Joi.string().required(),
+  address: Joi.string().required(),
+});
+
 const SignupForm = () => {
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   // const dispatch = useDispatch();
   const nav = useNavigate();
 
@@ -33,7 +46,13 @@ const SignupForm = () => {
       address: data.get("address"),
     };
 
-    const name = data.get("name")
+    const { error, value } = schema.validate(regPayload);
+    if (error) {
+      enqueueSnackbar(error);
+      return;
+    }
+
+    const name = data.get("name");
     // const name = data.get("name")
 
     try {
@@ -43,7 +62,6 @@ const SignupForm = () => {
       );
       const responseData = response.data;
       console.log("regres::", responseData);
-
 
       if (responseData.isRegistered === true) {
         nav("/");
@@ -59,11 +77,10 @@ const SignupForm = () => {
           })
           .catch((error) => {
             console.error(error);
+            enqueueSnackbar(error);
           });
       }
-    } catch (err) {
-      console.log(err);
-    }
+    } catch (err) {}
   };
 
   return (
