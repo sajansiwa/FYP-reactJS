@@ -16,6 +16,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Joi from "joi";
 import { useSnackbar } from "notistack";
+import { getFcmToken } from "../helpers/firebase_helpers";
 
 const API_KEY = "AIzaSyDh-hd8fgRHqk9ll9faCCuGA5vjka_XVCU";
 
@@ -27,6 +28,7 @@ const schema = Joi.object({
   password: Joi.string().required().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")),
   phoneNumber: Joi.string().required(),
   address: Joi.string().required(),
+  fcmtoken: Joi.string(),
 });
 
 const SignupForm = () => {
@@ -37,6 +39,7 @@ const SignupForm = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
+    const token = await getFcmToken();
 
     const regPayload = {
       email: data.get("email"),
@@ -44,6 +47,7 @@ const SignupForm = () => {
       password: data.get("password"),
       phoneNumber: data.get("phone"),
       address: data.get("address"),
+      fcmtoken: token,
     };
 
     const { error, value } = schema.validate(regPayload);

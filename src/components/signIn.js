@@ -26,6 +26,7 @@ const signInSchema = Joi.object({
     .email({ tlds: { allow: false } })
     .required(),
   password: Joi.string().required().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")),
+  fcmtoken: Joi.string(),
 });
 
 const SignInForm = () => {
@@ -38,9 +39,11 @@ const SignInForm = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
+    const token = await getFcmToken();
     const payload = {
       email_id: data.get("email"),
       password: data.get("password"),
+      fcmtoken: token,
     };
     const { error, value } = signInSchema.validate(payload);
     if (error) {
@@ -48,7 +51,6 @@ const SignInForm = () => {
       return;
     }
 
-    const res = await getFcmToken();
     // console.log(res);
 
     const response = await axios.post(

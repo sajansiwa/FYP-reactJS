@@ -11,14 +11,21 @@ import { initializeApp } from "firebase/app";
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import About from "./components/about";
-import { SnackbarProvider } from "notistack";
-import { useEffect } from "react";
-
-export let firebaseApp;
+import { SnackbarProvider, useSnackbar } from "notistack";
+import { useEffect, useState } from "react";
+import { getFcmToken } from "./helpers/firebase_helpers";
 
 const App = () => {
+  const { enqueueSnackbar } = useSnackbar();
+  async function getPermission() {
+    var response = await Notification.requestPermission();
+    if (response == "granted" || response == "default") {
+      const token = await getFcmToken();
+      console.log(token);
+    }
+  }
   useEffect(() => {
-    firebaseApp = initializeApp(firebaseConfig);
+    getPermission();
   }, []);
   return (
     <SnackbarProvider>
@@ -35,16 +42,6 @@ const App = () => {
       </Router>
     </SnackbarProvider>
   );
-};
-
-export const firebaseConfig = {
-  apiKey: "AIzaSyBY-cy02eGUphORAPYztuu9d9akron71tI",
-  authDomain: "hospital-1dad3.firebaseapp.com",
-  projectId: "hospital-1dad3",
-  storageBucket: "hospital-1dad3.appspot.com",
-  messagingSenderId: "602731118828",
-  appId: "1:602731118828:web:04dcfd5a8c31f1750e65c9",
-  measurementId: "G-FSZKXREGVC",
 };
 
 export default App;
