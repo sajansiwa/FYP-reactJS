@@ -10,9 +10,21 @@ import theme from "../theme/theme";
 import { Link } from "react-router-dom";
 import { Link as MuiLink } from "@material-ui/core";
 import { ThemeProvider } from "@mui/material/styles";
+import { useSnackbar } from "notistack";
+import { onMessageListener } from "../helpers/firebase_helpers";
 
 const NavBar = () => {
-  
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  onMessageListener().then((data) => {
+    enqueueSnackbar("Incoming Emergency", {
+      disableWindowBlurListener: true,
+      anchorOrigin: {
+        horizontal: "center",
+        vertical: "top",
+      },
+    });
+  });
+
   return (
     <ThemeProvider theme={theme}>
       <AppBar position="fixed">
@@ -26,12 +38,7 @@ const NavBar = () => {
             sx={{ flexGrow: 1 }}
           ></Typography>
           <Button color="inherit">
-            <MuiLink
-              component={Link}
-              to="/"
-              underline="none"
-              color="inherit"
-            >
+            <MuiLink component={Link} to="/" underline="none" color="inherit">
               Sign In
             </MuiLink>
           </Button>

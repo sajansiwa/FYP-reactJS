@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Box } from "@mui/system";
+import { onMessageListener } from "../helpers/firebase_helpers";
 // import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import DrawerComponent from "./drawer";
@@ -47,8 +48,6 @@ export default function Incoming(props) {
 
   const classes = useStyles();
 
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
-
   const [value, setValue] = useState(0);
 
   const handleChange = (event, newValue) => {
@@ -79,19 +78,7 @@ export default function Incoming(props) {
               textColor="primary"
               centered
             >
-              <Tab
-                label="Incoming"
-                onClick={() =>
-                  enqueueSnackbar("Incoming Emergency", {
-                    disableWindowBlurListener: true,
-                    anchorOrigin: {
-                      horizontal: "center",
-                      vertical: "top",
-                    },
-                    autoHideDuration: 2000,
-                  })
-                }
-              />
+              <Tab label="Incoming" />
               <Tab label="Completed" />
               <Tab label="Cancelled" />
             </Tabs>
@@ -109,7 +96,7 @@ export default function Incoming(props) {
               bgcolor: "secondary.main",
             }}
           >
-            {inComingNotification.map((data) => (
+            {/* {inComingNotification.map((data) => (
               <List>
                 <ListItemLink>
                   <ListItemAvatar>
@@ -125,7 +112,7 @@ export default function Incoming(props) {
                   />
                 </ListItemLink>
               </List>
-            ))}
+            ))} */}
           </Box>
         </Container>
       </Box>

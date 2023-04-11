@@ -66,6 +66,7 @@ const SignupForm = () => {
       );
       const responseData = response.data;
       console.log("regres::", responseData);
+      enqueueSnackbar(response.data.message);
 
       if (responseData.isRegistered === true) {
         nav("/");

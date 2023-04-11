@@ -20,6 +20,13 @@ import { useNavigate } from "react-router-dom";
 import Joi from "joi";
 import { useSnackbar } from "notistack";
 import { getFcmToken } from "../helpers/firebase_helpers";
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from "@mui/material";
 
 const signInSchema = Joi.object({
   email_id: Joi.string()
@@ -32,6 +39,15 @@ const signInSchema = Joi.object({
 const SignInForm = () => {
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   // const isLoggedIn = useSelector((state) => state.auth.isLoggedin);
+
+  const { showDialog, setShowDialog } = React.useState(false);
+  const handleClickOpen = () => {
+    setShowDialog(true);
+  };
+
+  const handleClose = () => {
+    setShowDialog(false);
+  };
 
   const nav = useNavigate();
 
@@ -60,11 +76,24 @@ const SignInForm = () => {
     // const responseData = response.data;
 
     const responseData = response.data;
-    console.log(responseData);
+    if (response.data.isUserVerified != true) {
+      enqueueSnackbar(
+        "You are Not Verified, Please follow verification email to verify your email and login",
+        {
+          disableWindowBlurListener: true,
+          variant: "error",
 
-    if (responseData.loggedIn === true) {
-      nav("/HomeComponent");
-      dispatch(Login(responseData));
+          anchorOrigin: {
+            horizontal: "center",
+            vertical: "top",
+          },
+        }
+      );
+    } else {
+      if (responseData.loggedIn === true) {
+        nav("/HomeComponent");
+        dispatch(Login(responseData));
+      }
     }
   };
 
@@ -123,9 +152,12 @@ const SignInForm = () => {
             </Button>
             <Grid container>
               <Grid item xs>
-                <Link href="#" variant="body2">
-                  Forgot password?
-                </Link>
+                <Button
+                  variant="outlined"
+                  onClick={() => nav("/forget-password")}
+                >
+                  Forget Password?
+                </Button>
               </Grid>
             </Grid>
           </Box>

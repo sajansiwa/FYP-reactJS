@@ -1,8 +1,6 @@
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 import { initializeApp } from "firebase/app";
 
-
-
 export async function getFcmToken() {
   const permissio = await Notification.requestPermission();
   if (permissio == "granted") {
@@ -24,6 +22,13 @@ const firebaseConfig = {
   measurementId: "G-FSZKXREGVC",
 };
 
-
 export const firebaseApp = initializeApp(firebaseConfig);
 export const messaging = getMessaging(firebaseApp);
+
+export const onMessageListener = () =>
+  new Promise((resolve) => {
+    onMessage(messaging, (payload) => {
+      console.log("payload", payload);
+      resolve(payload);
+    });
+  });
