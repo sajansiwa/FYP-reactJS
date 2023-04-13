@@ -17,6 +17,7 @@ import { useNavigate } from "react-router-dom";
 import Joi from "joi";
 import { useSnackbar } from "notistack";
 import { getFcmToken } from "../helpers/firebase_helpers";
+import { CircularProgress } from "@mui/material";
 
 const API_KEY = "AIzaSyDh-hd8fgRHqk9ll9faCCuGA5vjka_XVCU";
 
@@ -29,14 +30,17 @@ const schema = Joi.object({
   phoneNumber: Joi.string().required(),
   address: Joi.string().required(),
   fcmtoken: Joi.string(),
+  isHospital: Joi.bool(),
 });
 
 const SignupForm = () => {
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const [loading, setLoading] = React.useState(false);
   // const dispatch = useDispatch();
   const nav = useNavigate();
 
   const handleSubmit = async (event) => {
+    setLoading(true);
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const token = await getFcmToken();
@@ -48,6 +52,7 @@ const SignupForm = () => {
       phoneNumber: data.get("phone"),
       address: data.get("address"),
       fcmtoken: token,
+      isHospital: true,
     };
 
     const { error, value } = schema.validate(regPayload);
@@ -65,27 +70,12 @@ const SignupForm = () => {
         regPayload
       );
       const responseData = response.data;
-      console.log("regres::", responseData);
       enqueueSnackbar(response.data.message);
-
-      if (responseData.isRegistered === true) {
-        nav("/");
-        axios
-          .get(
-            `https://maps.googleapis.com/maps/api/geocode/json?address=${name}&key=${API_KEY}`
-          )
-          .then((response) => {
-            const location = response.data.results[0].geometry.location;
-            const latitude = location.lat;
-            const longitude = location.lng;
-            console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
-          })
-          .catch((error) => {
-            console.error(error);
-            enqueueSnackbar(error);
-          });
-      }
-    } catch (err) {}
+      nav("/");
+    } catch (err) {
+      enqueueSnackbar(err);
+    }
+    setLoading(false);
   };
 
   return (
@@ -185,15 +175,19 @@ const SignupForm = () => {
               </Grid>
             </Grid>
 
-            <Button
-              type="submit"
-              // fullWidth
-              size="large"
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-            >
-              Create Account
-            </Button>
+            {loading ? (
+              <CircularProgress />
+            ) : (
+              <Button
+                type="submit"
+                // fullWidth
+                size="large"
+                variant="contained"
+                sx={{ mt: 3, mb: 2 }}
+              >
+                Create Account
+              </Button>
+            )}
           </Box>
         </Box>
       </Container>

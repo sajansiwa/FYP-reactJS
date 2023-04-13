@@ -21,6 +21,7 @@ import Joi from "joi";
 import { useSnackbar } from "notistack";
 import { getFcmToken } from "../helpers/firebase_helpers";
 import {
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -37,6 +38,7 @@ const signInSchema = Joi.object({
 });
 
 const SignInForm = () => {
+  const [loading, setLoading] = React.useState(false);
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   // const isLoggedIn = useSelector((state) => state.auth.isLoggedin);
 
@@ -53,6 +55,7 @@ const SignInForm = () => {
 
   const dispatch = useDispatch();
   const handleSubmit = async (event) => {
+    setLoading(true);
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const token = await getFcmToken();
@@ -95,6 +98,7 @@ const SignInForm = () => {
         dispatch(Login(responseData));
       }
     }
+    setLoading(false);
   };
 
   return (
@@ -142,14 +146,18 @@ const SignInForm = () => {
               autoComplete="current-password"
             />
 
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-            >
-              Sign In
-            </Button>
+            {loading ? (
+              <CircularProgress />
+            ) : (
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                sx={{ mt: 3, mb: 2 }}
+              >
+                Sign In
+              </Button>
+            )}
             <Grid container>
               <Grid item xs>
                 <Button
