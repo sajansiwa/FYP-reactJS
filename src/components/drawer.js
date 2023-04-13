@@ -15,18 +15,17 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import theme from "../theme/theme";
 import { ThemeProvider } from "@mui/material";
+import { baseUrl } from "../constants/AppConstant";
 
-
- 
 const drawerWidth = 240;
 
 export default function DrawerComponent() {
-  const navigate = useNavigate()
-  
+  const navigate = useNavigate();
+
   const logoutFuncion = () => {
-    axios.post("http://localhost:4000/api/logout");
-    navigate('/')
-  }
+    axios.post(`${baseUrl}api/logout`);
+    navigate("/");
+  };
 
   return (
     <ThemeProvider theme={theme}>
@@ -58,7 +57,7 @@ export default function DrawerComponent() {
           }}
         >
           <Toolbar />
-          <Box sx={{ overflow: "auto"}}>
+          <Box sx={{ overflow: "auto" }}>
             <List>
               <ListItem
                 disablePadding
@@ -107,5 +106,3 @@ export default function DrawerComponent() {
     </ThemeProvider>
   );
 }
-
-

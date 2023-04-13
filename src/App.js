@@ -7,25 +7,42 @@ import DrawerComponent from "./components/drawer";
 import UserProfile from "./components/profile";
 import Incomming from "./components/incomming";
 
-import { initializeApp } from "firebase/app";
-
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import About from "./components/about";
-import { SnackbarProvider } from "notistack";
-import { useEffect } from "react";
-
-export let firebaseApp;
+import { SnackbarProvider, useSnackbar } from "notistack";
+import { useEffect, useState } from "react";
+import { getFcmToken } from "./helpers/firebase_helpers";
+import VerifyPage from "./pages/VerifyPage";
+import ForgetPassword from "./pages/ForgetPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 const App = () => {
+  const { enqueueSnackbar } = useSnackbar();
+  // onMessage(messaging, (payload) => {
+  //   console.log("Message received. ", payload);
+
+  // });
+
+  async function getPermission() {
+    var response = await Notification.requestPermission();
+    if (response == "granted" || response == "default") {
+      const token = await getFcmToken();
+      console.log(token);
+    }
+  }
   useEffect(() => {
-    firebaseApp = initializeApp(firebaseConfig);
+    getPermission();
   }, []);
+
   return (
     <SnackbarProvider>
       <Router>
         <NavBar />
         <Routes>
           <Route path="/HomeComponent" element={<Home />} />
+          <Route path="/forget-password" element={<ForgetPassword />} />
+          <Route path="/password-reset" element={<ResetPassword />} />
+          <Route path="/verify" element={<VerifyPage />} />
           <Route path="/Profile" element={<UserProfile />} />
           <Route path="/" element={<SignInForm />} />
           <Route path="/signup" element={<SignupForm />} />
@@ -35,16 +52,6 @@ const App = () => {
       </Router>
     </SnackbarProvider>
   );
-};
-
-export const firebaseConfig = {
-  apiKey: "AIzaSyBY-cy02eGUphORAPYztuu9d9akron71tI",
-  authDomain: "hospital-1dad3.firebaseapp.com",
-  projectId: "hospital-1dad3",
-  storageBucket: "hospital-1dad3.appspot.com",
-  messagingSenderId: "602731118828",
-  appId: "1:602731118828:web:04dcfd5a8c31f1750e65c9",
-  measurementId: "G-FSZKXREGVC",
 };
 
 export default App;
