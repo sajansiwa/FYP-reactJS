@@ -49,7 +49,7 @@ const Home = () => {
               bgcolor: "secondary.main",
               flexDirection: "column",
               alignItems: "center",
-              height: 100,
+              height: "50vh",
             }}
           >
             <Typography component="h1" variant="h5" sx={{ pb: 1 }}>
