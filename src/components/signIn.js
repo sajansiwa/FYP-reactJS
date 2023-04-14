@@ -93,6 +93,8 @@ const SignInForm = () => {
         }
       );
     } else {
+      setLoading(false);
+      console.log(responseData);
       if (responseData.loggedIn === true) {
         nav("/HomeComponent");
         dispatch(Login(responseData));

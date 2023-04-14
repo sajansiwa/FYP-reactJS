@@ -25,6 +25,8 @@ import { deepPurple } from "@mui/material/colors";
 import snackbar from "snackbar/lib/snackbar";
 import { useSnackbar } from "notistack";
 import axios from "axios";
+import { useSelector } from "react-redux";
+import { baseUrl } from "../constants/AppConstant";
 
 // import { CssBaseline } from "@material-ui/core";
 
@@ -39,11 +41,20 @@ export default function Incoming(props) {
   const { inComingNotification, setInComingNotification } = useState([]);
   const { completedNotification, setCompletedNotification } = useState([]);
   const { cancelledNotification, setCancelledNotification } = useState([]);
+  const userInfo = useSelector((state) => state.auth.user);
+
+  const fetchIncoming = async () => {};
 
   useEffect(() => {
     axios
-      .get("/api/visitedHosp")
-      .then((response) => setInComingNotification(response.data));
+      .get(`${baseUrl}api/get-visited`, {
+        params: {
+          email: userInfo.email_id,
+        },
+      })
+      .then((response) => {
+        console.log(response.data);
+      });
   }, [inComingNotification, completedNotification, cancelledNotification]);
 
   const classes = useStyles();
