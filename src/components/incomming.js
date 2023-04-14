@@ -90,6 +90,8 @@ export default function Incoming(props) {
     getIncoming();
   }, []);
   async function getIncoming() {
+    setInComingNotification([]);
+    setcompletedNotification([]);
     setLoading(true);
     await sleep(2000);
     axios
@@ -194,7 +196,7 @@ export default function Incoming(props) {
 
                   return (
                     <ListItem
-                      key={value}
+                      key={value.id}
                       secondaryAction={
                         <IconButton edge="end" aria-label="comments">
                           <DoneIcon />
@@ -236,7 +238,7 @@ export default function Incoming(props) {
                   const labelId = `checkbox-list-label-${value}`;
 
                   return (
-                    <ListItem key={value}>
+                    <ListItem key={value.id}>
                       <ListItemButton
                         role={undefined}
                         disabled
