@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { Box } from "@mui/system";
 import DrawerComponent from "./drawer";
 import { useState } from "react";
-import { TextField, Button, Grid } from "@material-ui/core";
+import { TextField, Button, Grid, Backdrop } from "@material-ui/core";
 import { CircularProgress, Container, ThemeProvider } from "@mui/material";
 import theme from "../theme/theme";
 import axios from "axios";
@@ -10,6 +10,7 @@ import { baseUrl } from "../constants/AppConstant";
 import { useSelector } from "react-redux";
 import { useSnackbar } from "notistack";
 import Joi from "joi";
+import { sleep } from "./incomming";
 
 const changePasswordSchema = Joi.object({
   email: Joi.string()
@@ -39,6 +40,7 @@ const About = () => {
 
   async function getprofileInfo() {
     setLoading(true);
+    await sleep(2000);
     const res = await axios.get(`${baseUrl}api/user`, {
       params: {
         email: userInfo.email_id,
@@ -68,6 +70,7 @@ const About = () => {
   const updatePassword = async () => {
     try {
       setLoading(true);
+      await sleep(2000);
       const payload = {
         currentPassword: currentPassword,
         password,
@@ -102,13 +105,17 @@ const About = () => {
       email: userInfo.email_id,
     };
     try {
+      setLoading(true);
+      await sleep(2000);
       const { data } = await axios.post(`${baseUrl}api/updateUser`, {
         ...payload,
       });
       enqueueSnackbar("User info updated!");
 
       console.log(data);
+      setLoading(false);
     } catch (error) {
+      setLoading(false);
       enqueueSnackbar(`Error: ${error}`);
     }
   };
@@ -163,6 +170,12 @@ const About = () => {
               boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.25)", // set box shadow
             }}
           >
+            <Backdrop
+              sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+              open={loading}
+            >
+              <CircularProgress color="inherit" />
+            </Backdrop>
             <Box
               sx={{
                 display: "flex",

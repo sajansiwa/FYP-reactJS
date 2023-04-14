@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
+import DoneIcon from "@mui/icons-material/Done";
+
 import { Box } from "@mui/system";
-import { onMessageListener } from "../helpers/firebase_helpers";
 // import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import DrawerComponent from "./drawer";
@@ -13,12 +14,19 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import {
   Avatar,
+  Backdrop,
   Button,
+  Checkbox,
+  CircularProgress,
   Container,
   Grid,
   IconButton,
   ListItemAvatar,
+  ListItemButton,
+  ListItemIcon,
+  ListSubheader,
   Snackbar,
+  Switch,
 } from "@mui/material";
 import theme from "../theme/theme";
 import { deepPurple } from "@mui/material/colors";
@@ -27,8 +35,14 @@ import { useSnackbar } from "notistack";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { baseUrl } from "../constants/AppConstant";
+import { onMessage } from "firebase/messaging";
+import { CheckBox } from "@mui/icons-material";
 
 // import { CssBaseline } from "@material-ui/core";
+
+export const sleep = (ms) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -38,14 +52,46 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Incoming(props) {
-  const { inComingNotification, setInComingNotification } = useState([]);
-  const { completedNotification, setCompletedNotification } = useState([]);
-  const { cancelledNotification, setCancelledNotification } = useState([]);
+  const [inComingNotification, setInComingNotification] = useState([]);
+  const [completedNotification, setcompletedNotification] = useState([]);
   const userInfo = useSelector((state) => state.auth.user);
+  const [loading, setLoading] = useState(false);
 
-  const fetchIncoming = async () => {};
+  const [checked, setChecked] = React.useState("");
+
+  const handleToggle = (value) => () => {
+    const currentIndex = checked.indexOf(value);
+    const newChecked = [...checked];
+    const id = value.v_id;
+    try {
+      axios
+        .post(`${baseUrl}api/markAsComplete`, {
+          id,
+        })
+        .then((data) => {
+          getIncoming();
+        });
+    } catch (error) {}
+
+    if (currentIndex === -1) {
+      newChecked.push(value);
+    } else {
+      newChecked.splice(currentIndex, 1);
+    }
+
+    setChecked(newChecked);
+  };
 
   useEffect(() => {
+    onMessage((payload) => {
+      getIncoming();
+    });
+
+    getIncoming();
+  }, []);
+  async function getIncoming() {
+    setLoading(true);
+    await sleep(2000);
     axios
       .get(`${baseUrl}api/get-visited`, {
         params: {
@@ -54,8 +100,16 @@ export default function Incoming(props) {
       })
       .then((response) => {
         console.log(response.data);
+        response.data.filter((data) => {
+          if (data.is_completed) {
+            setcompletedNotification(response.data);
+          } else {
+            setInComingNotification(response.data);
+          }
+        });
+        setLoading(false);
       });
-  }, [inComingNotification, completedNotification, cancelledNotification]);
+  }
 
   const classes = useStyles();
 
@@ -91,7 +145,6 @@ export default function Incoming(props) {
             >
               <Tab label="Incoming" />
               <Tab label="Completed" />
-              <Tab label="Cancelled" />
             </Tabs>
           </Box>
           <Box
@@ -100,32 +153,124 @@ export default function Incoming(props) {
               flexGrow: 1,
               display: "flex",
               justifyContent: "center",
-              // p: 1,
-              // ml: 32,
-              // overflow: "auto",
-              // mt: 10,
               bgcolor: "secondary.main",
+              marginLeft: 30,
+              flexDirection: "column",
             }}
           >
             {/* {inComingNotification.map((data) => (
-              <List>
-                <ListItemLink>
+              <List key={data}>
+                <ListItemLink
+                  secondary={
+                    <IconButton aria-label="comment">
+                      <CommentIcon />
+                    </IconButton>
+                  }
+                >
                   <ListItemAvatar>
                     <Avatar
-                      alt="A"
+                      alt={data.name.toUpperCase()}
                       src="/static/images/avatar/1.jpg"
                       sx={{ bgcolor: deepPurple[900] }}
                     />
                   </ListItemAvatar>
                   <ListItemText
                     primary={data.name}
-                    // secondary="Emergency for Aayush"
+                    secondary="Incoming Emergency"
                   />
                 </ListItemLink>
               </List>
             ))} */}
+            {value == 0 ? (
+              <List
+                sx={{
+                  width: "100%",
+                  maxWidth: 360,
+                  bgcolor: "background.paper",
+                }}
+              >
+                {inComingNotification.map((value) => {
+                  const labelId = `checkbox-list-label-${value}`;
+
+                  return (
+                    <ListItem
+                      key={value}
+                      secondaryAction={
+                        <IconButton edge="end" aria-label="comments">
+                          <DoneIcon />
+                        </IconButton>
+                      }
+                    >
+                      <ListItemButton
+                        role={undefined}
+                        onClick={handleToggle(value)}
+                        dense
+                      >
+                        <ListItemIcon>
+                          <Checkbox
+                            edge="start"
+                            checked={checked.indexOf(value) !== -1}
+                            tabIndex={-1}
+                            disableRipple
+                            inputProps={{ "aria-labelledby": labelId }}
+                          />
+                        </ListItemIcon>
+                        <ListItemText
+                          id={labelId}
+                          primary={`Emergency for ${value.name}`}
+                        />
+                      </ListItemButton>
+                    </ListItem>
+                  );
+                })}
+              </List>
+            ) : (
+              <List
+                sx={{
+                  width: "100%",
+                  maxWidth: 360,
+                  bgcolor: "background.paper",
+                }}
+              >
+                {completedNotification.map((value) => {
+                  const labelId = `checkbox-list-label-${value}`;
+
+                  return (
+                    <ListItem key={value}>
+                      <ListItemButton
+                        role={undefined}
+                        disabled
+                        onClick={handleToggle(value)}
+                        dense
+                      >
+                        <ListItemIcon>
+                          <Checkbox
+                            edge="start"
+                            checked={true}
+                            disabled
+                            tabIndex={-1}
+                            disableRipple
+                            inputProps={{ "aria-labelledby": labelId }}
+                          />
+                        </ListItemIcon>
+                        <ListItemText
+                          id={labelId}
+                          primary={`Emergency for ${value.name}`}
+                        />
+                      </ListItemButton>
+                    </ListItem>
+                  );
+                })}
+              </List>
+            )}
           </Box>
         </Container>
+        <Backdrop
+          sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+          open={loading}
+        >
+          <CircularProgress color="inherit" />
+        </Backdrop>
       </Box>
     </ThemeProvider>
   );
@@ -189,7 +334,7 @@ export default function Incoming(props) {
 // };
 
 function ListItemLink(props) {
-  return <ListItem button component="a" {...props} />;
+  return <ListItem button component="a" {...props} secondaryAction />;
 }
 
 // export default Incomming;
