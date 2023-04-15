@@ -45,6 +45,7 @@ const Home = () => {
               p: 12,
               ml: 32,
               overflow: "auto",
+              background: "indigo",
               mt: 10,
               bgcolor: "secondary.main",
               flexDirection: "column",

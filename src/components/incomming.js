@@ -57,6 +57,7 @@ export default function Incoming(props) {
   const userInfo = useSelector((state) => state.auth.user);
   const [loading, setLoading] = useState(false);
 
+  const [value, setValue] = useState(0);
   const [checked, setChecked] = React.useState("");
 
   const handleToggle = (value) => () => {
@@ -64,14 +65,19 @@ export default function Incoming(props) {
     const newChecked = [...checked];
     const id = value.v_id;
     try {
+      setLoading(true);
       axios
         .post(`${baseUrl}api/markAsComplete`, {
           id,
         })
         .then((data) => {
-          getIncoming();
+          setLoading(false);
+          getIncomingPatient();
         });
-    } catch (error) {}
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
+    }
 
     if (currentIndex === -1) {
       newChecked.push(value);
@@ -84,38 +90,42 @@ export default function Incoming(props) {
 
   useEffect(() => {
     onMessage((payload) => {
-      getIncoming();
+      getIncomingPatient();
     });
-
-    getIncoming();
   }, []);
-  async function getIncoming() {
-    setInComingNotification([]);
-    setcompletedNotification([]);
+
+  useEffect(() => {
+    getIncomingPatient();
+  }, [value]);
+
+  async function getIncomingPatient() {
     setLoading(true);
     await sleep(2000);
-    axios
-      .get(`${baseUrl}api/get-visited`, {
+    if (value === 0) {
+      setInComingNotification([]);
+      const response = await axios.get(`${baseUrl}api/get-visited`, {
         params: {
           email: userInfo.email_id,
+          type: false,
         },
-      })
-      .then((response) => {
-        console.log(response.data);
-        response.data.filter((data) => {
-          if (data.is_completed) {
-            setcompletedNotification(response.data);
-          } else {
-            setInComingNotification(response.data);
-          }
-        });
-        setLoading(false);
       });
+      setLoading(false);
+      setInComingNotification(response.data);
+    } else {
+      setcompletedNotification([]);
+      const response = await axios.get(`${baseUrl}api/get-visited`, {
+        params: {
+          email: userInfo.email_id,
+          type: true,
+        },
+      });
+      setLoading(false);
+      setcompletedNotification(response.data);
+    }
+    setLoading(false);
   }
 
   const classes = useStyles();
-
-  const [value, setValue] = useState(0);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -183,7 +193,7 @@ export default function Incoming(props) {
                 </ListItemLink>
               </List>
             ))} */}
-            {value == 0 ? (
+            {value === 0 ? (
               <List
                 sx={{
                   width: "100%",
@@ -239,18 +249,11 @@ export default function Incoming(props) {
 
                   return (
                     <ListItem key={value.id}>
-                      <ListItemButton
-                        role={undefined}
-                        disabled
-                        onClick={handleToggle(value)}
-                        dense
-                      >
+                      <ListItemButton role={undefined} onClick={null} dense>
                         <ListItemIcon>
                           <Checkbox
                             edge="start"
                             checked={true}
-                            disabled
-                            tabIndex={-1}
                             disableRipple
                             inputProps={{ "aria-labelledby": labelId }}
                           />
@@ -278,92 +281,6 @@ export default function Incoming(props) {
   );
 }
 
-// const Incomming = () => {
-//   const [notifications, setNotifications] = useState(["aayush"]);
-//   const classes = useStyles();
-
-//   return (
-//     <Grid>
-//       <Grid xs={8}>
-
-//       </Grid>
-//       <Box
-//         component="main"
-//         sx={{ p: 1, ml: 32, overflow: "auto", mt: 5 }}
-//         centered
-//       ></Box>
-//       <div className={classes.root}>
-
-//         {value === 0 && (
-//           <List
-//             sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}
-//           >
-//             <ListItemLink href="#">
-//               <ListItemText
-//                 primary="Item 3"
-//                 secondary="This is a completed item"
-//               />
-//             </ListItemLink>
-//           </List>
-//         )}
-
-//         {value === 1 && (
-
-//         )}
-
-//         {value === 2 && (
-//           <List>
-//             <ListItemLink href="#">
-//               <ListItemAvatar>
-//                 <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
-//               </ListItemAvatar>
-//               <ListItemText
-//                 primary="Item 5"
-//                 secondary="This is a cancelled item"
-//               />
-//             </ListItemLink>
-//             <ListItemLink href="#">
-//               <ListItemText
-//                 primary="Item 6"
-//                 secondary="This is also a cancelled item"
-//               />
-//             </ListItemLink>
-//           </List>
-//         )}
-//       </div>
-//     </Grid>
-//   );
-// };
-
 function ListItemLink(props) {
   return <ListItem button component="a" {...props} secondaryAction />;
 }
-
-// export default Incomming;
-
-// //  <List
-// //   sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}
-// // >
-// //   {[0, 1, 2, 3, 4, 5, 6].map((value) => {
-// //     const labelId = `checkbox-list-label-${value}`;
-
-// //     return (
-// //       <ListItem
-// //         key={value}
-// //         secondaryAction={
-// //           <IconButton edge="end" aria-label="comments">
-// //             {/* <CommentIcon /> */}
-// //           </IconButton>
-// //         }
-// //         disablePadding
-// //       >
-// //         <ListItemButton role={undefined} dense>
-// //           <ListItemText
-// //             id={labelId}
-// //             primary={`Line item ${value + 1}`}
-// //           />
-// //         </ListItemButton>
-// //       </ListItem>
-// //     );
-// //   })}
-// // </List>
