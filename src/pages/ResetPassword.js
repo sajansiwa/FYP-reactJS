@@ -16,7 +16,11 @@ import { baseUrl } from "../constants/AppConstant";
 const passwordResetSchema = Joi.object({
   token: Joi.string().required(),
   password: Joi.string().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")),
-  confirm_password: Joi.ref("password"),
+  confirm_password: Joi.any()
+    .equal(Joi.ref("password"))
+    .required()
+    .label("Confirm password")
+    .messages({ "any.only": "{{#label}} does not match" }),
 });
 
 export default function ResetPassword() {
@@ -50,7 +54,8 @@ export default function ResetPassword() {
         nav("/");
       }
     } catch (error) {
-      enqueueSnackbar(error);
+      console.log(error);
+      enqueueSnackbar(error.response.data.message);
     }
   };
 
