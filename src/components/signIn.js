@@ -67,40 +67,46 @@ const SignInForm = () => {
     const { error, value } = signInSchema.validate(payload);
     if (error) {
       enqueueSnackbar(error);
+      setLoading(false);
       return;
+    } else {
+      try {
+        const response = await axios.post(
+          "http://localhost:4000/api/Login",
+          payload
+        );
+        // const responseData = response.data;
+
+        const responseData = response.data;
+        if (response.data.isUserVerified != true) {
+          enqueueSnackbar(
+            "You are Not Verified, Please follow verification email to verify your email and login",
+            {
+              disableWindowBlurListener: true,
+              variant: "error",
+
+              anchorOrigin: {
+                horizontal: "center",
+                vertical: "top",
+              },
+            }
+          );
+        } else {
+          setLoading(false);
+          console.log(responseData);
+          if (responseData.loggedIn === true) {
+            nav("/HomeComponent");
+            dispatch(Login(responseData));
+          }
+        }
+        setLoading(false);
+      } catch (error) {
+        enqueueSnackbar(error.response.data.message);
+        setLoading(false);
+      }
     }
 
     // console.log(res);
-
-    const response = await axios.post(
-      "http://localhost:4000/api/Login",
-      payload
-    );
-    // const responseData = response.data;
-
-    const responseData = response.data;
-    if (response.data.isUserVerified != true) {
-      enqueueSnackbar(
-        "You are Not Verified, Please follow verification email to verify your email and login",
-        {
-          disableWindowBlurListener: true,
-          variant: "error",
-
-          anchorOrigin: {
-            horizontal: "center",
-            vertical: "top",
-          },
-        }
-      );
-    } else {
-      setLoading(false);
-      console.log(responseData);
-      if (responseData.loggedIn === true) {
-        nav("/HomeComponent");
-        dispatch(Login(responseData));
-      }
-    }
-    setLoading(false);
   };
 
   return (

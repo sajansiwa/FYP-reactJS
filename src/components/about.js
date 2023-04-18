@@ -290,7 +290,10 @@ const About = () => {
       {loading ? (
         <CircularProgress sx={{ flexGrow: 1, p: 1, ml: 32, mt: 10 }} />
       ) : (
-        <Box component="main" sx={{ flexGrow: 1, p: 1, ml: 32, mt: 10 }}>
+        <Box
+          component="main"
+          sx={{ flexGrow: 1, p: 1, ml: 32, mt: 10, borderRadius: "8px" }}
+        >
           {isEditMode ? renderTextFields() : renderDetails()}
           {isEditMode && (
             <Container>

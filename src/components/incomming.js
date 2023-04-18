@@ -201,40 +201,64 @@ export default function Incoming(props) {
                   bgcolor: "background.paper",
                 }}
               >
-                {inComingNotification.map((value) => {
-                  const labelId = `checkbox-list-label-${value}`;
-
-                  return (
-                    <ListItem
-                      key={value.id}
-                      secondaryAction={
-                        <IconButton edge="end" aria-label="comments">
-                          <DoneIcon />
-                        </IconButton>
-                      }
+                {inComingNotification.length == 0 ? (
+                  <Box
+                    centered
+                    alignItems="center"
+                    display="flex"
+                    height="50vh"
+                    alignContent="center"
+                    textAlign="center"
+                  >
+                    <Typography
+                      component="h6"
+                      variant="h6"
+                      sx={{
+                        color: "#3D5A80",
+                        marginLeft: 10,
+                      }}
+                      textAlign="center"
                     >
-                      <ListItemButton
-                        role={undefined}
-                        onClick={handleToggle(value)}
-                        dense
+                      No Incoming Patient, When Patient Check in, You'll get
+                      Notification and List will display here.
+                    </Typography>
+                  </Box>
+                ) : (
+                  inComingNotification.map((value) => {
+                    const labelId = `checkbox-list-label-${value}`;
+
+                    return (
+                      <ListItem
+                        key={value.id}
+                        secondaryAction={
+                          <IconButton edge="end" aria-label="comments">
+                            <DoneIcon />
+                          </IconButton>
+                        }
                       >
-                        <ListItemIcon>
-                          <Checkbox
-                            edge="start"
-                            checked={checked.indexOf(value) !== -1}
-                            tabIndex={-1}
-                            disableRipple
-                            inputProps={{ "aria-labelledby": labelId }}
+                        <ListItemButton
+                          role={undefined}
+                          onClick={handleToggle(value)}
+                          dense
+                        >
+                          <ListItemIcon>
+                            <Checkbox
+                              edge="start"
+                              checked={checked.indexOf(value) !== -1}
+                              tabIndex={-1}
+                              disableRipple
+                              inputProps={{ "aria-labelledby": labelId }}
+                            />
+                          </ListItemIcon>
+                          <ListItemText
+                            id={labelId}
+                            primary={`Emergency for ${value.name}`}
                           />
-                        </ListItemIcon>
-                        <ListItemText
-                          id={labelId}
-                          primary={`Emergency for ${value.name}`}
-                        />
-                      </ListItemButton>
-                    </ListItem>
-                  );
-                })}
+                        </ListItemButton>
+                      </ListItem>
+                    );
+                  })
+                )}
               </List>
             ) : (
               <List
@@ -244,28 +268,52 @@ export default function Incoming(props) {
                   bgcolor: "background.paper",
                 }}
               >
-                {completedNotification.map((value) => {
-                  const labelId = `checkbox-list-label-${value}`;
+                {completedNotification.length == 0 ? (
+                  <Box
+                    centered
+                    alignItems="center"
+                    display="flex"
+                    height="50vh"
+                    alignContent="center"
+                    textAlign="center"
+                  >
+                    <Typography
+                      component="h6"
+                      variant="h6"
+                      sx={{
+                        color: "#3D5A80",
+                        marginLeft: 10,
+                      }}
+                      textAlign="center"
+                    >
+                      No Completed Item here, When Patient Check in, You can
+                      complete the Check In.
+                    </Typography>
+                  </Box>
+                ) : (
+                  completedNotification.map((value) => {
+                    const labelId = `checkbox-list-label-${value}`;
 
-                  return (
-                    <ListItem key={value.id}>
-                      <ListItemButton role={undefined} onClick={null} dense>
-                        <ListItemIcon>
-                          <Checkbox
-                            edge="start"
-                            checked={true}
-                            disableRipple
-                            inputProps={{ "aria-labelledby": labelId }}
+                    return (
+                      <ListItem key={value.id}>
+                        <ListItemButton role={undefined} onClick={null} dense>
+                          <ListItemIcon>
+                            <Checkbox
+                              edge="start"
+                              checked={true}
+                              disableRipple
+                              inputProps={{ "aria-labelledby": labelId }}
+                            />
+                          </ListItemIcon>
+                          <ListItemText
+                            id={labelId}
+                            primary={`Emergency for ${value.name}`}
                           />
-                        </ListItemIcon>
-                        <ListItemText
-                          id={labelId}
-                          primary={`Emergency for ${value.name}`}
-                        />
-                      </ListItemButton>
-                    </ListItem>
-                  );
-                })}
+                        </ListItemButton>
+                      </ListItem>
+                    );
+                  })
+                )}
               </List>
             )}
           </Box>

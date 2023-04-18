@@ -9,7 +9,6 @@ import { Container, ThemeProvider } from "@mui/material";
 import theme from "../theme/theme";
 import { useSelector } from "react-redux";
 // import { CssBaseline } from "@material-ui/core";
-
 const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
@@ -45,26 +44,46 @@ const Home = () => {
               p: 12,
               ml: 32,
               overflow: "auto",
-              background: "indigo",
+              background: "#3D5A80",
               mt: 10,
-              bgcolor: "secondary.main",
+              borderRadius: "8px",
+              bgcolor: "3D5A80",
               flexDirection: "column",
               alignItems: "center",
               height: "50vh",
             }}
           >
-            <Typography component="h1" variant="h5" sx={{ pb: 1 }}>
+            <img
+              src={require("../images/logo.jpeg")}
+              alt="Logo"
+              height={150}
+              width={150}
+              style={{
+                borderRadius: "400px",
+              }}
+            />
+            <Typography
+              component="h1"
+              variant="h5"
+              sx={{ pb: 1, color: "#FFF" }}
+            >
               Welcome Back,
             </Typography>
             <Typography
               component="h6"
               variant="h6"
               className={classes.name}
-              sx={{ pb: 1 }}
+              sx={{ pb: 1, color: "#FFF" }}
             >
               {user.user.name}
             </Typography>
-            <Typography component="p" className={classes.name}>
+            <Typography
+              component="p"
+              className={classes.name}
+              sx={{
+                color: "#4caf50",
+              }}
+            >
               email: {user.user.email_id}
             </Typography>
             {/* <Typography fontFamily={"Lora"}>
